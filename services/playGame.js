@@ -1,14 +1,12 @@
 import Riddle from "../../Server/class/Riddle.js";
 import Player from "../../Server/class/Player.js";
-import { CRUD } from "../../Server/services/generic.crud.js";
+import { api } from "./api.js";
 import { MenuPlayer } from "../menus.js";
 
-const playerCrud = new CRUD("../Server/db/players.txt");
-const riddleCrud = new CRUD("../Server/db/riddles.txt");
 
 async function PlayerEntry() {
     const jsonPlayer = MenuPlayer();
-    const players = await playerCrud.GetAll();
+    const players = await api.getFetch("players");
 
     let playerExists = players.find(p => p.id === jsonPlayer.id);
     if (!playerExists) {

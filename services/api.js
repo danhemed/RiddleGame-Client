@@ -6,7 +6,7 @@ export const api = {
         return await res.json();
     },
 
-    async createFetch(data, path) {
+    async postFetch(data, path) {
         const res = await fetch(`${BASE_URL}/${path}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -15,7 +15,7 @@ export const api = {
         return await res.json();
     },
 
-    async updateFetch(id, data, path) {
+    async putFetch(id, data, path) {
         const res = await fetch(`${BASE_URL}/${path}/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
