@@ -1,36 +1,30 @@
-import Riddle from "../Server/class/Riddle.js";
-import Player from "../Server/class/Player.js";
-import { CRUD } from "../Server/services/generic.crud.js";
-import { MenuPlayer } from "./menus.js";
+import Riddle from "../../Server/class/Riddle.js";
+import Player from "../../Server/class/Player.js";
+import { api } from "./api.js";
+import { MenuPlayer } from "../menus.js";
 
-const playerCrud = new CRUD("Server/db/players.txt");
-const riddleCrud = new CRUD("Server/db/riddles.txt");
 
-// function to check if player exists if not create one and return player...
 async function PlayerEntry() {
     const jsonPlayer = MenuPlayer();
-    const players = await playerCrud.GetAll();
+    const players = await api.getFetch("players");
 
-    let playerExists = players.find(p => p.id === jsonPlayer.id);
+    let playerExists = players.find(p => Number(p.id) === Number(jsonPlayer.id));
     if (!playerExists) {
         playerExists = {...jsonPlayer, times: []};
-        await playerCrud.Create(playerExists);
-        console.log(`Create a new Player: ${playerExists.name}`);
+        await api.postFetch(playerExists, "players");
+        console.log(`Create a new Player: ${playerExists.name} in ID: ${playerExists.id}`);
     } else {
-        console.log(`welcome again ${playerExists.name} `)
+        console.log(`welcome again ${playerExists.name} ID: ${playerExists.id} `)
     }
     const player = new Player(playerExists.name);
-    player.id = playerExists.id;
+    player.id = Number(playerExists.id);
     player.times = playerExists.times || [];
 
     return player;
 }
 
-
-// function to show the riddles to the player and check if the answer is right or mistakes is,
-// if the player won the all game the function return true.
 async function PlayRiddles(player) {
-    const allRiddles = await riddleCrud.GetAll();
+    const allRiddles = await api.getFetch("riddles");
     if (allRiddles.length === 0) {
         console.log(`There is no data at all.\n`)
         return null;
@@ -73,7 +67,6 @@ async function PlayRiddles(player) {
     return true;
 }
 
-// function the play the game activate player and the ridlles if the player won it update the times of player...
 export async function PlayGame() {
     const player = await PlayerEntry();
     const won = await PlayRiddles(player);
@@ -83,32 +76,9 @@ export async function PlayGame() {
     }
 
     if (won) {
-        await playerCrud.Update(player.id, {
+        await api.putFetch(player.id, {
             name : player.name,
             times : player.times
-        })
+        }, "players");
     }
-}
-
-// function to show all victories of players
-export async function ShowPlayerVictories() {
-    const players = await playerCrud.GetAll();
-
-    console.log(`LeaderBoard:`);
-    console.log(`=`.repeat(30));
-
-    const playerBestTime = players.map(p => {
-        const bestTime = p.times && p.times.length > 0 ? Math.min(...p.times) : Infinity;
-        return {...p, bestTime};
-    })
-
-    playerBestTime.sort((a, b) => a.bestTime - b.bestTime);
-
-    playerBestTime.forEach((p, i) => {
-        if (p.bestTime === Infinity) {
-            console.log(`${i+1}. ${p.name} - No wins yet`);
-        } else {
-            console.log(`${i+1}. ${p.name} - ${p.bestTime} seconds`);
-        }
-    });
 }
