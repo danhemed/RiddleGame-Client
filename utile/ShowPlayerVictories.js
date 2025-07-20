@@ -1,5 +1,7 @@
+import { api } from "../services/api.js";
+
 export async function ShowPlayerVictories() {
-    const players = await playerCrud.GetAll();
+    const players = await api.getFetch("players");
 
     console.log(`LeaderBoard:`);
     console.log(`=`.repeat(30));

@@ -8,23 +8,23 @@ async function PlayerEntry() {
     const jsonPlayer = MenuPlayer();
     const players = await api.getFetch("players");
 
-    let playerExists = players.find(p => p.id === jsonPlayer.id);
+    let playerExists = players.find(p => Number(p.id) === Number(jsonPlayer.id));
     if (!playerExists) {
         playerExists = {...jsonPlayer, times: []};
-        await playerCrud.Create(playerExists);
-        console.log(`Create a new Player: ${playerExists.name}`);
+        await api.postFetch(playerExists, "players");
+        console.log(`Create a new Player: ${playerExists.name} in ID: ${playerExists.id}`);
     } else {
-        console.log(`welcome again ${playerExists.name} `)
+        console.log(`welcome again ${playerExists.name} ID: ${playerExists.id} `)
     }
     const player = new Player(playerExists.name);
-    player.id = playerExists.id;
+    player.id = Number(playerExists.id);
     player.times = playerExists.times || [];
 
     return player;
 }
 
 async function PlayRiddles(player) {
-    const allRiddles = await riddleCrud.GetAll();
+    const allRiddles = await api.getFetch("riddles");
     if (allRiddles.length === 0) {
         console.log(`There is no data at all.\n`)
         return null;
@@ -76,9 +76,9 @@ export async function PlayGame() {
     }
 
     if (won) {
-        await playerCrud.Update(player.id, {
+        await api.putFetch(player.id, {
             name : player.name,
             times : player.times
-        })
+        }, "players");
     }
 }
