@@ -1,8 +1,10 @@
 import { PlayGame } from "./services/playGame.js";
 import { api } from "./services/api.js";
-import { ShowPlayerVictories } from "./utile/ShowPlayerVictories.js";
+import { ShowPlayerScores } from "./utile/ShowPlayerScores.js";
 import { Menu, MenuCreateRiddle, MenuUpdateRiddle, } from "./menus.js";
 import { checkID } from "../Server/services/checkID.js";
+import { dalRiddles } from "../Server/dal/dal.riddles.js";
+
 
 let choice;
 
@@ -17,24 +19,24 @@ do {
             }
             break;
         case '2':
-            await api.postFetch(MenuCreateRiddle(), "riddles");
+            await dalRiddles.insertRiddle(MenuCreateRiddle());
             break;
         case '3':
-            console.table(await api.getFetch("riddles"));
+            console.table(await dalRiddles.getRiddles());
             break;
         case '4':
-            const allriddles = await api.getFetch("riddles");
+            const allriddles = await dalRiddles.getRiddles();
             const idExists = await checkID(allriddles);
             if (idExists === null) {
                 break;
             }
-            await api.putFetch(idExists, MenuUpdateRiddle(), "riddles")
+            await dalRiddles.updateRiddle(idExists, MenuUpdateRiddle())
             break;
         case '5':
-            console.log(await api.deleteFetch(await checkID(await api.getFetch("riddles"))));
+            console.log(await dalRiddles.deleteRiddle(await checkID(await dalRiddles.getRiddles())));
             break;
         case '6':
-            await ShowPlayerVictories();
+            await ShowPlayerScores();
             break;
         case '0':
             console.log(`BYE BYE!! `);

@@ -2,29 +2,32 @@ import Riddle from "../../Server/class/Riddle.js";
 import Player from "../../Server/class/Player.js";
 import { api } from "./api.js";
 import { MenuPlayer } from "../menus.js";
+import { dalRiddles } from "../../Server/dal/dal.riddles.js";
+import { dalPlayers } from "../../Server/dal/dal.players.js";
+import { dalScores } from "../../Server/dal/dal.scores.js";
 
 
 async function PlayerEntry() {
     const jsonPlayer = MenuPlayer();
-    const players = await api.getFetch("players");
+    const players = await dalPlayers.getAllPlayers();
 
     let playerExists = players.find(p => Number(p.id) === Number(jsonPlayer.id));
     if (!playerExists) {
         playerExists = {...jsonPlayer, times: []};
-        await api.postFetch(playerExists, "players");
+        await dalPlayers.insertNewPlayer(playerExists);
         console.log(`Create a new Player: ${playerExists.name} in ID: ${playerExists.id}`);
     } else {
         console.log(`welcome again ${playerExists.name} ID: ${playerExists.id} `)
     }
     const player = new Player(playerExists.name);
     player.id = Number(playerExists.id);
-    player.times = playerExists.times || [];
+    player.bestTime = playerExists.bestTime;
 
     return player;
 }
 
 async function PlayRiddles(player) {
-    const allRiddles = await api.getFetch("riddles");
+    const allRiddles = await dalRiddles.getRiddles();
     if (allRiddles.length === 0) {
         console.log(`There is no data at all.\n`)
         return null;
@@ -76,9 +79,9 @@ export async function PlayGame() {
     }
 
     if (won) {
-        await api.putFetch(player.id, {
+        await dalScores.insertNewPlayer(player.id, {
             name : player.name,
             times : player.times
-        }, "players");
+        });
     }
 }
