@@ -34,11 +34,15 @@ export const api = {
     },
 
     async deleteFetch(id, path) {
-        const res = await fetch(`${BASE_URL}/${path}/${id}`, {
-            method: "DELETE",
-        })
-        return await res.json();
+        try {
+            const res = await fetch(`${BASE_URL}/${path}/${id}`, {
+                method: "DELETE",
+            })
+            return await res.json({ message: "The deletion was successful" });
+        } catch (err) {
+            console.log(err.message);
+        }
     },
-} 
+}
 
 

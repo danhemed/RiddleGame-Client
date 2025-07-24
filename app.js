@@ -37,7 +37,8 @@ do {
             }
             break;
         case '5':
-            console.log(await api.deleteFetch(await checkID(await api.getFetch("riddles"))));
+            const allriddles2 = await api.getFetch("riddles");
+            console.log(await api.deleteFetch(await checkID(allriddles2), "riddles"));
             break;
         case '6':
             await ShowPlayerScores();
