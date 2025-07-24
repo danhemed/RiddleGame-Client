@@ -14,13 +14,11 @@ export function Menu() {
 }
 
 export function MenuCreateRiddle() {
-    const id = readline.question('Enter ID: ');
     const name = readline.question('Enter Name: ');
     const taskDescription = readline.question('Enter task Description: ');
     const correctAnswer = readline.question('Enter correct Answer: ');
 
     return {
-        id,
         name,
         taskDescription,
         correctAnswer
@@ -46,10 +44,10 @@ export function MenuUpdateRiddle() {
 export function MenuPlayer() {
     console.log(`Hey player, enter your details >>`)
     const id = readline.question('Enter ID: ');
-    const name = readline.question('Enter Name: ');
+    const username = readline.question('Enter UserName: ');
 
     return {
         id,
-        name
+        username
     };
 }

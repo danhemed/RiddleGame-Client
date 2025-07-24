@@ -2,32 +2,31 @@ import Riddle from "../../Server/class/Riddle.js";
 import Player from "../../Server/class/Player.js";
 import { api } from "./api.js";
 import { MenuPlayer } from "../menus.js";
-import { dalRiddles } from "../../Server/dal/dal.riddles.js";
-import { dalPlayers } from "../../Server/dal/dal.players.js";
-import { dalScores } from "../../Server/dal/dal.scores.js";
 
 
 async function PlayerEntry() {
     const jsonPlayer = MenuPlayer();
-    const players = await dalPlayers.getAllPlayers();
+    const players = await api.getFetch("players");
 
-    let playerExists = players.find(p => Number(p.id) === Number(jsonPlayer.id));
-    if (!playerExists) {
-        playerExists = {...jsonPlayer, times: []};
-        await dalPlayers.insertNewPlayer(playerExists);
-        console.log(`Create a new Player: ${playerExists.name} in ID: ${playerExists.id}`);
+    let playerExists = players.find(p => p.username === jsonPlayer.username);
+
+    if (playerExists === undefined) {
+        playerExists = { username: jsonPlayer.username };
+        await api.postFetch(playerExists, "players");
+        const newPlayers = await api.getFetch("players");
+        if (newPlayers.length > players.length) {
+            console.log(`Create a new Player: ${playerExists.username}`);
+        }
     } else {
-        console.log(`welcome again ${playerExists.name} ID: ${playerExists.id} `)
+        console.log(`Welcome again ${playerExists.username}`)
     }
-    const player = new Player(playerExists.name);
-    player.id = Number(playerExists.id);
-    player.bestTime = playerExists.bestTime;
+    const player = new Player(playerExists.username);
 
     return player;
 }
 
 async function PlayRiddles(player) {
-    const allRiddles = await dalRiddles.getRiddles();
+    const allRiddles = await api.getFetch("riddles");
     if (allRiddles.length === 0) {
         console.log(`There is no data at all.\n`)
         return null;
@@ -42,14 +41,14 @@ async function PlayRiddles(player) {
         console.log(`level ${level}: ${riddle.name}`);
 
         let answeredCorrectly = false;
-        
+
         while (!answeredCorrectly) {
             const answer = riddle.ask();
             if (answer.toLowerCase() !== riddle.correctAnswer.toLowerCase()) {
                 mistakes++;
                 console.log(`You Were Wrong! Mistake ${mistakes}! Try again!\n`)
-    
-                if (mistakes >=3) {
+
+                if (mistakes >= 3) {
                     console.log(`Game over!\n`);
                     return false;
                 }
@@ -58,7 +57,7 @@ async function PlayRiddles(player) {
                 answeredCorrectly = true;
                 level++;
             }
-        } 
+        }
     }
     console.log(`YOU ARE A CHAMPION! YOU WON!!\n`);
 
@@ -79,9 +78,9 @@ export async function PlayGame() {
     }
 
     if (won) {
-        await dalScores.insertNewPlayer(player.id, {
-            name : player.name,
-            times : player.times
-        });
+        await api.postFetch(player.id, {
+            name: player.name,
+            times: player.times
+        }, "players");
     }
 }

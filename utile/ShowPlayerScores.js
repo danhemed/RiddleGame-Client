@@ -1,8 +1,7 @@
 import { api } from "../services/api.js";
-import { dalScores } from "../../Server/dal/dal.scores.js";
 
 export async function ShowPlayerScores() {
-    const playerScores = await dalScores.getAllPlayers();
+    const playerScores = await api.getFetch("players");
 
     console.log(`LeaderBoard:`);
     console.log(`=`.repeat(30));

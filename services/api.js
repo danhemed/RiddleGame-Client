@@ -7,21 +7,30 @@ export const api = {
     },
 
     async postFetch(data, path) {
-        const res = await fetch(`${BASE_URL}/${path}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        })
-        return await res.json();
+        try {
+            const res = await fetch(`${BASE_URL}/${path}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            })
+            return await res.json();
+        } catch (err) {
+            console.log(err.message);
+        }
     },
 
     async putFetch(id, data, path) {
-        const res = await fetch(`${BASE_URL}/${path}/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        })
-        return await res.json();
+        try {
+            const res = await fetch(`${BASE_URL}/${path}/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            })
+            console.log(res);
+            return await res.json();
+        } catch (err) {
+            console.log(err.message);
+        }
     },
 
     async deleteFetch(id, path) {
