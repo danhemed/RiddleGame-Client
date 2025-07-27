@@ -117,7 +117,7 @@ export async function PlayGame() {
         }
         player.wins = player.wins + 1;
         await api.putFetch(player.id, {
-            bestTime: player.bestTime,
+            best_Time: player.bestTime,
             wins : player.wins
         }, `players`);
 
