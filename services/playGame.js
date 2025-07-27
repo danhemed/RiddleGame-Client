@@ -10,8 +10,6 @@ async function PlayerEntry() {
 
     const playerExists = players.find(p => p.username === jsonPlayer.username);
 
-    console.log(playerExists);
-
     if (playerExists === undefined) {
         const newPlayer = { username: jsonPlayer.username };
         try {
@@ -25,7 +23,6 @@ async function PlayerEntry() {
         } catch (err) {
             console.log(`get new player ${err.message}`);
         }
-        console.log(newPlayerGet);
         if (newPlayerGet) {
             console.log(`Create a new Player: ${newPlayerGet.username} and ID: ${newPlayerGet.id}`);
             const player = new Player(newPlayerGet.id, newPlayerGet.username);
@@ -33,7 +30,9 @@ async function PlayerEntry() {
         }
     }
     console.log(`Welcome again ${playerExists.username}\n`)
-    const player = new Player(playerExists.id, playerExists.username, playerExists.bestTime, playerExists.wins);
+    const player = new Player(playerExists.id, playerExists.username);
+    player.bestTime = playerExists.best_time;
+    player.wins = playerExists.wins;
     return player;
 }
 
@@ -84,7 +83,6 @@ async function PlayRiddles(player) {
                 
                 const end = Date.now();
                 await player.recordTime(start, end);
-
                 await playerScoreEntry(player.id, riddle.id, player.bestTime);
             }
         }
@@ -96,8 +94,6 @@ export async function PlayGame() {
     const player = await PlayerEntry();
     const won = await PlayRiddles(player);
 
-    console.log(player);
-
     if (won === false) {
         console.log("Game Over!!\n")
     }
@@ -108,17 +104,16 @@ export async function PlayGame() {
 
     if (won) {
         const playerScores = await api.getFetch(`scores/${player.id}`);
+        let bestTime = playerScores[0].time_to_solve;
         for (const score of playerScores) {
-            console.log(score);
-            console.log(score.time_to_solve);
-            if (score.time_to_solve < player.bestTime){
-                player.bestTime = score.time_to_solve;
+            if (score.time_to_solve < bestTime){
+                bestTime = score.time_to_solve;
             }
         }
-        player.wins = player.wins + 1;
+        const playerwins = player.wins + 1;
         await api.putFetch(player.id, {
-            best_Time: player.bestTime,
-            wins : player.wins
+            best_time: bestTime,
+            wins: playerwins
         }, `players`);
 
         console.log(`\n<<< YOU ARE A CHAMPION! YOU WON!! >>>\n`);
