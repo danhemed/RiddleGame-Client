@@ -12,7 +12,7 @@ export const api = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
-            })
+            });
             return await res.json();
         } catch (err) {
             console.log(err.message);
@@ -25,8 +25,7 @@ export const api = {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
-            })
-            console.log(res);
+            });
             return await res.json();
         } catch (err) {
             console.log(err.message);
@@ -37,8 +36,8 @@ export const api = {
         try {
             const res = await fetch(`${BASE_URL}/${path}/${id}`, {
                 method: "DELETE",
-            })
-            return await res.json({ message: "The deletion was successful" });
+            });
+            return await res.json();
         } catch (err) {
             console.log(err.message);
         }
