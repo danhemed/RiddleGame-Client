@@ -95,7 +95,11 @@ export async function PlayGame() {
     const won = await PlayRiddles(player);
 
     if (won === false) {
-        console.log("Game Over!!\n")
+        console.log("G A M E  O V E R !!\n");
+        console.log(`>>> Youre Score:`)
+        console.table(playerScores);
+        const { wins } = await api.getFetch(`players/wins/${player.id}`);
+        console.log(`>>> Youre Wins: ${wins}`);
     }
 
     if (won === null) {
